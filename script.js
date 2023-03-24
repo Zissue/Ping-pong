@@ -1,6 +1,31 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+const particles = [];
+
+class Particle {
+  constructor(x, y, angle) {
+    this.x = x;
+    this.y = y;
+    this.angle = angle;
+    this.speed = 5;
+    this.life = 1;
+  }
+
+  update() {
+    this.x += this.speed * Math.cos(this.angle);
+    this.y += this.speed * Math.sin(this.angle);
+    this.life -= 0.02;
+  }
+
+  draw(ctx) {
+    ctx.fillStyle = `rgba(255, 128, 0, ${this.life})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2, true);
+    ctx.fill();
+  }
+}
+
 let animationFrames = 0;
 let playerPaddleColor = "#fff";
 let computerPaddleColor = "#fff";
@@ -151,9 +176,14 @@ function getMousePos(canvas, event) {
   };
 }
 
+const playfieldThickness = 10;
+
 function draw() {
   // Clear canvas
   drawRect(0, 0, canvas.width, canvas.height, "#202020");
+
+  // Draw playfield
+  drawRect(playfieldThickness, playfieldThickness, canvas.width - 2 * playfieldThickness, canvas.height - 2 * playfieldThickness, "#303030");
 
   // Draw paddles
   drawRect(0, computerY, paddleWidth, paddleHeight, computerPaddleColor);
@@ -161,7 +191,16 @@ function draw() {
 
   // Draw ball
   drawCircle(ballX, ballY, ballRadius, "#fff");
-  
+
+  // Draw particles
+  particles.forEach((particle) => {
+    particle.update();
+    particle.draw(ctx);
+  });
+
+  // Remove dead particles
+  particles = particles.filter((particle) => particle.life > 0);
+
   // Animate scoreboard
   animateScore();
 
@@ -170,9 +209,11 @@ function draw() {
 }
 
 
+
 function gameLoop() {
   moveBall();
   computerAI();
+  emitParticles();
   draw();
 
   requestAnimationFrame(gameLoop);
