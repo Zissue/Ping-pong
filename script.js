@@ -9,19 +9,21 @@ class Particle {
     this.y = y;
     this.angle = angle;
     this.speed = 5;
-    this.life = 1;
+    this.life = 0.3;
+    this.size = 8;
   }
 
   update() {
     this.x += this.speed * Math.cos(this.angle);
     this.y += this.speed * Math.sin(this.angle);
-    this.life -= 0.02;
+    this.life -= 0.01;
   }
 
   draw(ctx) {
-    ctx.fillStyle = `rgba(255, 128, 0, ${this.life})`;
+    const opacity = Math.min(1, this.life * 3);
+    ctx.fillStyle = `rgba(255, 128, 0, ${opacity})`;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2, true);
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, true);
     ctx.fill();
   }
 }
@@ -209,9 +211,14 @@ function draw() {
 }
 
 function emitParticles() {
+  if (ballSpeedX > 0) {
+    return;
+  }
   const angle = Math.atan2(ballSpeedY, ballSpeedX);
+  const x = ballX - ballRadius * Math.cos(angle);
+  const y = ballY - ballRadius * Math.sin(angle);
   for (let i = 0; i < 5; i++) {
-    particles.push(new Particle(ballX, ballY, angle + Math.random() * 0.4 - 0.2));
+    particles.push(new Particle(x, y, angle + Math.random() * 0.4 - 0.2));
   }
 }
 
