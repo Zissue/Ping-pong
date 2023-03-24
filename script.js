@@ -87,7 +87,7 @@ function resetBall() {
 
   // Set animationFrames and colorChangeFrames
   animationFrames = 60;
-  colorChangeFrames = 30;
+  colorChangeFrames = 90;
 }
 
 function handlePaddleColorChange() {
