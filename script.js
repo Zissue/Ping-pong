@@ -9,8 +9,8 @@ let playerY = (canvas.height - paddleHeight) / 2;
 let computerY = (canvas.height - paddleHeight) / 2;
 let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
-let ballSpeedX = 2.5;
-let ballSpeedY = 2.5;
+let ballSpeedX = 2;
+let ballSpeedY = 0;
 
 function drawRect(x, y, width, height, color) {
   ctx.fillStyle = color;
@@ -60,12 +60,20 @@ function resetBall() {
 
 function computerAI() {
   const computerCenter = computerY + paddleHeight / 2;
-  if (computerCenter < ballY - 20) {
-    computerY += 5;
-  } else if (computerCenter > ballY + 20) {
-    computerY -= 5;
+  const ballDistanceFromPaddle = ballX - paddleWidth;
+  const framesToReachBall = ballDistanceFromPaddle / Math.abs(ballSpeedX);
+  const predictedBallY = ballY + ballSpeedY * framesToReachBall;
+
+  const minY = Math.max(predictedBallY - 20, 0);
+  const maxY = Math.min(predictedBallY + 20, canvas.height - paddleHeight);
+
+  if (computerCenter < minY) {
+    computerY += 3;
+  } else if (computerCenter > maxY) {
+    computerY -= 3;
   }
 }
+
 
 canvas.addEventListener("mousemove", (event) => {
   const mousePos = getMousePos(canvas, event);
