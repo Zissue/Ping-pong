@@ -2,15 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.5">
   <title>Ping Pong Game</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Ping Pong</h1>
+  <h1><img src="img/ppHop.webp" alt="ppHop">Ping Pong<img src="img/ppHop.webp" alt="ppHop"></h1>
   <div id="scoreboard">Computer: 0 | Player: 0</div>
   <canvas id="gameCanvas" width="800" height="400"></canvas>
-  <script src="script.js"></script>
+  <script src="https://libwebpjs.appspot.com/libwebp-0.6.0.min.js"></script>
+  <script type="module" src="main.js"></script>
+  <script>  <!-- Add this block -->
+    document.body.style.zoom = "150%";
+  </script>
+
+  <select id="gameMode">
+    <option value="player">Player vs AI</option>
+    <option value="ai">AI vs AI</option>
+  </select>
 </body>
-<div id="last-updated" style="position: fixed; bottom: 10px; right: 10px; font-size: 14px; color: #fff;">Last updated:</div>
+<div id="last-updated" style="position: fixed; bottom: 10px; right: 10px; font-size: 14px; color: #5f5f5f;">Last updated:</div>
 </html>
