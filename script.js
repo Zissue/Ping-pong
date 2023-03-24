@@ -3,7 +3,7 @@ const ctx = canvas.getContext("2d");
 
 const paddleWidth = 10;
 const paddleHeight = 75;
-const ballRadius = 20;
+const ballRadius = 12;
 
 let playerY = (canvas.height - paddleHeight) / 2;
 let computerY = (canvas.height - paddleHeight) / 2;
@@ -25,6 +25,8 @@ function drawCircle(x, y, radius, color) {
 }
 
 function moveBall() {
+  const maxSpeed = 10;
+
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
@@ -49,7 +51,14 @@ function moveBall() {
       resetBall();
     }
   }
+
+  const speedMagnitude = Math.sqrt(ballSpeedX * ballSpeedX + ballSpeedY * ballSpeedY);
+  if (speedMagnitude > maxSpeed) {
+    ballSpeedX = (ballSpeedX / speedMagnitude) * maxSpeed;
+    ballSpeedY = (ballSpeedY / speedMagnitude) * maxSpeed;
+  }
 }
+
 
 function resetBall() {
   ballX = canvas.width / 2;
