@@ -1,8 +1,27 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+const gameModeSelect = document.getElementById("gameMode");
+let gameMode = "player";
+
+gameModeSelect.addEventListener("change", (event) => {
+  gameMode = event.target.value;
+});
+
 import { ScoreAnimation } from './Classes/scoreAnimation.js';
 import { Particle } from './Classes/particle.js';
+
+let insaneImage = new Image();
+insaneImage.src = "img/PagBounce.gif";
+
+let soBadImage = new Image();
+soBadImage.src = "img/OMEGALUL.png";
+
+let messageDuration = 1; // Change this value to control message duration
+let showMessage = false;
+let messageTimer = 0;
+let lastScorer = "";
+
 
 let particles = [];
 
@@ -89,9 +108,13 @@ function resetBall() {
   if (ballX > canvas.width) {
     computerScore++;
     playerPaddleColor = "#f00";
+    showMessage = true;
+    lastScorer = "computer";
   } else {
     playerScore++;
     computerPaddleColor = "#f00";
+    showMessage = true;
+    lastScorer = "player";
   }
 
   scoreboard.textContent = `Computer: ${computerScore} | Player: ${playerScore}`;
@@ -125,6 +148,7 @@ function resetBall() {
     scoreAnimations.push(new ScoreAnimation(paddleWidth + 10, computerY));
   }
 }
+
 
 function pauseGame(duration, callback) {
   clearInterval(gameInterval);
@@ -222,13 +246,92 @@ function getMousePos(canvas, event) {
   };
 }
 
-const playfieldThickness = 10;
+function emitParticles() {
+  const angle = Math.atan2(ballSpeedY, ballSpeedX) + Math.PI / 2; // Ensure particles move upward
+  const xOffset = ballRadius * Math.cos(angle);
+  const yOffset = ballRadius * Math.sin(angle);
+  const x = ballX - xOffset;
+  const y = ballY - yOffset;
+  for (let i = 0; i < 5; i++) { // Decrease the number of particles
+    particles.push(new Particle(x, y, angle + Math.random() * 0.3 - 0.15, xOffset, yOffset)); // Narrower angle range
+  }
+}
+
+function playerAI() {
+  const playerCenter = playerY + paddleHeight / 2;
+  const ballDistanceFromPaddle = canvas.width - paddleWidth - ballX;
+  const framesToReachBall = ballDistanceFromPaddle / Math.abs(ballSpeedX);
+  const predictedBallY = ballY + ballSpeedY * framesToReachBall;
+
+  const minY = Math.max(predictedBallY - 20, 0);
+  const maxY = Math.min(predictedBallY + 20, canvas.height - paddleHeight);
+
+  // Introduce randomness to AI movement
+  const randomFactor = 0.45; // Adjust this value (0 to 1) to control the AI's accuracy
+
+  if (playerCenter < minY && Math.random() < randomFactor) {
+    playerY += 3;
+  } else if (playerCenter > maxY && Math.random() < randomFactor) {
+    playerY -= 3;
+  }
+
+  // Keep the player paddle within the playfield
+  if (playerY < 0) {
+    playerY = 0;
+  } else if (playerY + paddleHeight > canvas.height) {
+    playerY = canvas.height - paddleHeight;
+  }
+}
+
+function drawMessage() {
+
+  if (showMessage && messageTimer < messageDuration) {
+    ctx.font = "40px Helvetica";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    const textY = canvas.height / 2 - 50;
+
+    if (lastScorer === "player") {
+      ctx.fillText("INSANE", canvas.width / 2, textY);
+      if (insaneImage) {
+        ctx.drawImage(insaneImage, (canvas.width - insaneImage.width) / 2, textY + 10);
+      }
+    } else {
+      ctx.fillText("SO BAD", canvas.width / 2, textY);
+      if (soBadImage) {
+        ctx.drawImage(soBadImage, (canvas.width - soBadImage.width) / 2, textY + 10);
+      }
+    }
+
+    messageTimer++;
+  } else {
+    showMessage = false;
+    messageTimer = 0;
+  }
+}
+
+
+function updateScore() {
+  if (ballX < 0) {
+    computerScore++;
+    resetBall();
+    showMessage = true;
+    lastScorer = "computer";
+  } else if (ballX > canvas.width) {
+    playerScore++;
+    resetBall();
+    showMessage = true;
+    lastScorer = "player";
+  }
+}
+
 
 function draw() {
   // Clear canvas
   drawRect(0, 0, canvas.width, canvas.height, "#202020");
 
   // Draw playfield
+  const playfieldThickness = 10;
   drawRect(playfieldThickness, playfieldThickness, canvas.width - 2 * playfieldThickness, canvas.height - 2 * playfieldThickness, "#303030");
 
   // Draw paddles
@@ -249,6 +352,7 @@ function draw() {
 
   // Animate scoreboard
   animateScore();
+  drawMessage();
 
   // Handle paddle color change
   handlePaddleColorChange();
@@ -263,23 +367,18 @@ function draw() {
   scoreAnimations = scoreAnimations.filter((animation) => animation.opacity > 0);
 }
 
-function emitParticles() {
-  const angle = Math.atan2(ballSpeedY, ballSpeedX) + Math.PI / 2; // Ensure particles move upward
-  const xOffset = ballRadius * Math.cos(angle);
-  const yOffset = ballRadius * Math.sin(angle);
-  const x = ballX - xOffset;
-  const y = ballY - yOffset;
-  for (let i = 0; i < 5; i++) { // Decrease the number of particles
-    particles.push(new Particle(x, y, angle + Math.random() * 0.3 - 0.15, xOffset, yOffset)); // Narrower angle range
-  }
-}
-
-
-
 function gameLoop() {
   if (!isPaused) {
     moveBall();
     computerAI();
+
+    // Update the game loop to handle the new game mode
+    if (gameMode === "ai") {
+      playerAI();
+    }
+
+    updateScore();
+
     emitParticles();
     draw();
   }
