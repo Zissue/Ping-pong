@@ -16,7 +16,7 @@ let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 let ballSpeedX = 3;
 let ballSpeedY = -10;
-const maxSpeed = 10;
+const maxSpeed = 6;
 
 let playerScore = 0;
 let computerScore = 0;
