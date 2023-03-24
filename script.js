@@ -1,0 +1,72 @@
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const paddleWidth = 10;
+const paddleHeight = 75;
+const ballRadius = 5;
+
+let playerY = (canvas.height - paddleHeight) / 2;
+let computerY = (canvas.height - paddleHeight) / 2;
+let ballX = canvas.width / 2;
+let ballY = canvas.height / 2;
+let ballSpeedX = 5;
+let ballSpeedY = 0;
+
+function drawRect(x, y, width, height, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, width, height);
+}
+
+function drawCircle(x, y, radius, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2, true);
+  ctx.fill();
+}
+
+function moveBall() {
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+
+  if (ballY < 0 || ballY > canvas.height) {
+    ballSpeedY = -ballSpeedY;
+  }
+
+  if (ballX < 0) {
+    if (ballY > computerY && ballY < computerY + paddleHeight) {
+      ballSpeedX = -ballSpeedX;
+      ballSpeedY += (ballY - (computerY + paddleHeight / 2)) * 0.3;
+    } else {
+      resetBall();
+    }
+  }
+
+  if (ballX > canvas.width) {
+    if (ballY > playerY && ballY < playerY + paddleHeight) {
+      ballSpeedX = -ballSpeedX;
+      ballSpeedY += (ballY - (playerY + paddleHeight / 2)) * 0.3;
+    } else {
+      resetBall();
+    }
+  }
+}
+
+function resetBall() {
+  ballX = canvas.width / 2;
+  ballY = canvas.height / 2;
+  ballSpeedX = -ballSpeedX;
+  ballSpeedY = 0;
+}
+
+function computerAI() {
+  const computerCenter = computerY + paddleHeight / 2;
+  if (computerCenter < ballY - 20) {
+    computerY += 5;
+  } else if (computerCenter > ballY + 20) {
+    computerY -= 5;
+  }
+}
+
+canvas.addEventListener("mousemove", (event) => {
+  const mousePos = getMousePos(canvas, event);
+  playerY = mousePos.y - paddleHeight / 2
