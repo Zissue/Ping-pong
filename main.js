@@ -64,7 +64,7 @@ let computerY = (canvas.height - paddleHeight) / 2;
 let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 let ballSpeedX = 3;
-let ballSpeedY = -10;
+let ballSpeedY = 0;
 const maxSpeed = 3.5;
 const maxBounceAngle = 5 * Math.PI / 12; // 75 degrees in radians
 
@@ -276,23 +276,16 @@ function playerAI() {
   }
 }
 
-canvas.addEventListener("mousemove", (event) => {
+window.addEventListener("mousemove", (event) => {
 
   if (gameMode === "ai") return;
 
   const mousePos = getMousePos(canvas, event);
-  const zoomLevel = parseFloat(document.body.style.zoom) / 100 || 1;
+  // const zoomLevel = parseFloat(document.body.style.zoom) / 100 || 1;
   const rect = canvas.getBoundingClientRect();
   const scaleY = canvas.height / rect.height;
-  
-  playerY = (mousePos.y * scaleY) / zoomLevel - paddleHeight / 2;
 
-  // Keep the player paddle within the playfield
-  if (playerY < 0) {
-    playerY = 0;
-  } else if (playerY + paddleHeight > canvas.height) {
-    playerY = canvas.height - paddleHeight;
-  }
+  playerY = Math.min(Math.max(mousePos.y - paddleHeight / 2, 0), canvas.height - paddleHeight);
 });
 
   
@@ -305,7 +298,7 @@ function getMousePos(canvas, evt) {
 }
 
 function emitParticles() {
-  const angle = Math.atan2(ballSpeedY, ballSpeedX) + Math.PI / 2; // Ensure particles move upward
+  const angle = Math.atan2(-ballSpeedY, -ballSpeedX) + Math.PI / 2; // Ensure particles move in the opposite direction of the ball
   const xOffset = ballRadius * Math.cos(angle);
   const yOffset = ballRadius * Math.sin(angle);
   const x = ballX - xOffset;
@@ -314,6 +307,7 @@ function emitParticles() {
     particles.push(new Particle(x, y, angle + Math.random() * 0.3 - 0.15, xOffset, yOffset)); // Narrower angle range
   }
 }
+
 
 function drawMessage() {
 
