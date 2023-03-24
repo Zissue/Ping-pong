@@ -208,7 +208,14 @@ function draw() {
   handlePaddleColorChange();
 }
 
+function emitParticles() {
+  const particleCount = Math.abs(ballSpeedX) + Math.abs(ballSpeedY);
 
+  for (let i = 0; i < particleCount; i++) {
+    const particle = new Particle(ballX, ballY, Math.random() * Math.PI * 2);
+    particles.push(particle);
+  }
+}
 
 function gameLoop() {
   moveBall();
