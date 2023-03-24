@@ -155,8 +155,8 @@ function draw() {
   drawRect(0, 0, canvas.width, canvas.height, "#202020");
 
   // Draw paddles
-  drawRect(0, computerY, paddleWidth, paddleHeight, "#fff");
-  drawRect(canvas.width - paddleWidth, playerY, paddleWidth, paddleHeight, "#fff");
+  drawRect(0, computerY, paddleWidth, paddleHeight, computerPaddleColor);
+  drawRect(canvas.width - paddleWidth, playerY, paddleWidth, paddleHeight, playerPaddleColor);
 
   // Draw ball
   drawCircle(ballX, ballY, ballRadius, "#fff");
@@ -167,6 +167,7 @@ function draw() {
   // Handle paddle color change
   handlePaddleColorChange();
 }
+
 
 function gameLoop() {
   moveBall();
