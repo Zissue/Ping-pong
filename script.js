@@ -69,4 +69,39 @@ function computerAI() {
 
 canvas.addEventListener("mousemove", (event) => {
   const mousePos = getMousePos(canvas, event);
-  playerY = mousePos.y - paddleHeight / 2
+  playerY = Math.min(Math.max(mousePos.y - paddleHeight / 2, 0), canvas.height - paddleHeight);
+});
+  
+function getMousePos(canvas, event) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  return {
+    x: (event.clientX - rect.left) * scaleX,
+    y: (event.clientY - rect.top) * scaleY,
+  };
+}
+
+function draw() {
+  // Clear canvas
+  drawRect(0, 0, canvas.width, canvas.height, "#202020");
+
+  // Draw paddles
+  drawRect(0, computerY, paddleWidth, paddleHeight, "#fff");
+  drawRect(canvas.width - paddleWidth, playerY, paddleWidth, paddleHeight, "#fff");
+
+  // Draw ball
+  drawCircle(ballX, ballY, ballRadius, "#fff");
+}
+
+function gameLoop() {
+  moveBall();
+  computerAI();
+  draw();
+
+  requestAnimationFrame(gameLoop);
+}
+
+// Start the game loop
+gameLoop();
