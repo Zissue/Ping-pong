@@ -10,7 +10,8 @@ let computerY = (canvas.height - paddleHeight) / 2;
 let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 let ballSpeedX = 2;
-let ballSpeedY = 0;
+let ballSpeedY = -10;
+const maxSpeed = 10;
 
 let playerScore = 0;
 let computerScore = 0;
@@ -29,7 +30,6 @@ function drawCircle(x, y, radius, color) {
 }
 
 function moveBall() {
-  const maxSpeed = 5;
 
   ballX += ballSpeedX;
   ballY += ballSpeedY;
