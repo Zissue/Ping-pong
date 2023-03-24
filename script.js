@@ -2,6 +2,9 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 let animationFrames = 0;
+let playerPaddleColor = "#fff";
+let computerPaddleColor = "#fff";
+let colorChangeFrames = 0;
 
 const paddleWidth = 10;
 const paddleHeight = 75;
@@ -73,7 +76,7 @@ function resetBall() {
     playerScore++;
   }
 
-  scoreboard.textContent = `Player: ${playerScore} | Computer: ${computerScore}`;
+  scoreboard.textContent = `Computer: ${computerScore} | Player: ${playerScore}`;
 
   ballX = canvas.width / 2;
   ballY = canvas.height / 2;
@@ -82,6 +85,18 @@ function resetBall() {
 
   // Set animationFrames to the desired number of frames for the animation
   animationFrames = 60;
+  
+  // Set colorChangeFrames to the desired number of frames for the color change effect
+  colorChangeFrames = 30;
+}
+
+function handlePaddleColorChange() {
+  if (colorChangeFrames > 0) {
+    colorChangeFrames--;
+  } else {
+    playerPaddleColor = "#fff";
+    computerPaddleColor = "#fff";
+  }
 }
 
 function animateScore() {
@@ -140,6 +155,9 @@ function draw() {
   
   // Animate scoreboard
   animateScore();
+  
+  // Handle paddle color change
+  handlePaddleColorChange();
 }
 
 function gameLoop() {
