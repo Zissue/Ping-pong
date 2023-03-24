@@ -12,6 +12,10 @@ let ballY = canvas.height / 2;
 let ballSpeedX = 2;
 let ballSpeedY = 0;
 
+let playerScore = 0;
+let computerScore = 0;
+const scoreboard = document.getElementById("scoreboard");
+
 function drawRect(x, y, width, height, color) {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, width, height);
@@ -61,6 +65,15 @@ function moveBall() {
 
 
 function resetBall() {
+  
+  if (ballX > canvas.width) {
+    computerScore++;
+  } else {
+    playerScore++;
+  }
+  
+  scoreboard.textContent = `Player: ${playerScore} | Computer: ${computerScore}`;
+  
   ballX = canvas.width / 2;
   ballY = canvas.height / 2;
   ballSpeedX = -ballSpeedX;
