@@ -1,6 +1,8 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+let animationFrames = 0;
+
 const paddleWidth = 10;
 const paddleHeight = 75;
 const ballRadius = 12;
@@ -65,19 +67,31 @@ function moveBall() {
 
 
 function resetBall() {
-  
   if (ballX > canvas.width) {
     computerScore++;
   } else {
     playerScore++;
   }
-  
-  scoreboard.textContent = `Computer: ${computerScore} | Player: ${playerScore}`;
-  
+
+  scoreboard.textContent = `Player: ${playerScore} | Computer: ${computerScore}`;
+
   ballX = canvas.width / 2;
   ballY = canvas.height / 2;
   ballSpeedX = -ballSpeedX;
   ballSpeedY = 0;
+
+  // Set animationFrames to the desired number of frames for the animation
+  animationFrames = 60;
+}
+
+function animateScore() {
+  if (animationFrames > 0) {
+    const scale = 1 + 0.1 * (60 - animationFrames) / 60;
+    scoreboard.style.transform = `scale(${scale})`;
+    animationFrames--;
+  } else {
+    scoreboard.style.transform = 'scale(1)';
+  }
 }
 
 function computerAI() {
@@ -123,6 +137,9 @@ function draw() {
 
   // Draw ball
   drawCircle(ballX, ballY, ballRadius, "#fff");
+  
+  // Animate scoreboard
+  animateScore();
 }
 
 function gameLoop() {
