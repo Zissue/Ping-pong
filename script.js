@@ -16,7 +16,7 @@ let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 let ballSpeedX = 3;
 let ballSpeedY = -10;
-const maxSpeed = 6;
+const maxSpeed = 3.5;
 const maxBounceAngle = 5 * Math.PI / 12; // 75 degrees in radians
 
 let playerScore = 0;
