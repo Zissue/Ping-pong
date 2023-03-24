@@ -234,14 +234,8 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-// Add this function to your script.js file
 async function updateLastUpdated() {
-  const token = process.env.READ_COMMIT_TOKEN;
-  const response = await fetch("https://api.github.com/repos/zissue/zissue.github.io/commits?per_page=1", {
-    headers: {
-      Authorization: `token ${token}`,
-    },
-  });
+  const response = await fetch("https://api.github.com/repos/zissue/zissue.github.io/commits?per_page=1");
   const data = await response.json();
   const lastCommitDate = new Date(data[0].commit.author.date).toLocaleDateString();
   const lastUpdatedElement = document.getElementById("last-updated");
