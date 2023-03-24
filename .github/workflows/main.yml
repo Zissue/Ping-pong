@@ -13,9 +13,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Inject token
-        run: echo "REACT_APP_READ_COMMIT_TOKEN=${{ secrets.READ_COMMIT_TOKEN }}" >> .env.production
-
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
