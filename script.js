@@ -72,8 +72,10 @@ function moveBall() {
 function resetBall() {
   if (ballX > canvas.width) {
     computerScore++;
+    playerPaddleColor = "#f00";
   } else {
     playerScore++;
+    computerPaddleColor = "#f00";
   }
 
   scoreboard.textContent = `Computer: ${computerScore} | Player: ${playerScore}`;
@@ -83,10 +85,8 @@ function resetBall() {
   ballSpeedX = -ballSpeedX;
   ballSpeedY = 0;
 
-  // Set animationFrames to the desired number of frames for the animation
+  // Set animationFrames and colorChangeFrames
   animationFrames = 60;
-  
-  // Set colorChangeFrames to the desired number of frames for the color change effect
   colorChangeFrames = 30;
 }
 
@@ -155,7 +155,7 @@ function draw() {
   
   // Animate scoreboard
   animateScore();
-  
+
   // Handle paddle color change
   handlePaddleColorChange();
 }
