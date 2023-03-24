@@ -14,7 +14,7 @@ class Particle {
   }
 
   update() {
-    this.x += this.speed * Math.cos(this.angle);
+    this.x += this.speed * Math.cos(this.angle) * -1;
     this.y += this.speed * Math.sin(this.angle);
     this.life -= 0.01;
   }
@@ -191,14 +191,14 @@ function draw() {
   drawRect(0, computerY, paddleWidth, paddleHeight, computerPaddleColor);
   drawRect(canvas.width - paddleWidth, playerY, paddleWidth, paddleHeight, playerPaddleColor);
 
-  // Draw ball
-  drawCircle(ballX, ballY, ballRadius, "#fff");
-
   // Draw particles
   particles.forEach((particle) => {
     particle.update();
     particle.draw(ctx);
   });
+  
+    // Draw ball
+  drawCircle(ballX, ballY, ballRadius, "#fff");
 
   // Remove dead particles
   particles = particles.filter((particle) => particle.life > 0);
