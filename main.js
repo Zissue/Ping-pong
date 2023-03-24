@@ -8,6 +8,28 @@ gameModeSelect.addEventListener("change", (event) => {
   gameMode = event.target.value;
 });
 
+const playButton = document.getElementById("playButton");
+const pauseResumeButton = document.getElementById("pauseResumeButton");
+
+playButton.addEventListener("click", startGame);
+pauseResumeButton.addEventListener("click", togglePauseResume);
+
+function startGame() {
+  playButton.style.display = "none";
+  pauseResumeButton.style.display = "inline";
+  isPaused = false; // Start the game when the "Play" button is pressed
+}
+
+function togglePauseResume() {
+  if (isPaused) {
+    pauseResumeButton.textContent = "Pause";
+  } else {
+    pauseResumeButton.textContent = "Resume";
+  }
+  isPaused = !isPaused;
+}
+
+
 import { ScoreAnimation } from './Classes/scoreAnimation.js';
 import { Particle } from './Classes/particle.js';
 
@@ -31,7 +53,7 @@ let animationFrames = 0;
 let playerPaddleColor = "#fff";
 let computerPaddleColor = "#fff";
 let colorChangeFrames = 0;
-let isPaused = false;
+let isPaused = true;
 
 const paddleWidth = 10;
 const paddleHeight = 75;
@@ -202,6 +224,10 @@ function animateScore() {
   }
 }
 
+
+const randomFactorPlayer = 0.99; // Adjust this value (0 to 1) to control the player AI's accuracy
+const randomFactorAI = 0.6; // Adjust this value (0 to 1) to control the AI's accuracy
+
 function computerAI() {
   const computerCenter = computerY + paddleHeight / 2;
   const ballDistanceFromPaddle = ballX - paddleWidth;
@@ -212,11 +238,10 @@ function computerAI() {
   const maxY = Math.min(predictedBallY + 20, canvas.height - paddleHeight);
 
   // Introduce randomness to AI movement
-  const randomFactor = 0.3; // Adjust this value (0 to 1) to control the AI's accuracy
 
-  if (computerCenter < minY && Math.random() < randomFactor) {
+  if (computerCenter < minY && Math.random() < randomFactorAI) {
     computerY += 3;
-  } else if (computerCenter > maxY && Math.random() < randomFactor) {
+  } else if (computerCenter > maxY && Math.random() < randomFactorAI) {
     computerY -= 3;
   }
 
@@ -225,35 +250,6 @@ function computerAI() {
     computerY = 0;
   } else if (computerY + paddleHeight > canvas.height) {
     computerY = canvas.height - paddleHeight;
-  }
-}
-
-
-
-canvas.addEventListener("mousemove", (event) => {
-  const mousePos = getMousePos(canvas, event);
-  playerY = Math.min(Math.max(mousePos.y - paddleHeight / 2, 0), canvas.height - paddleHeight);
-});
-  
-function getMousePos(canvas, event) {
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-
-  return {
-    x: (event.clientX - rect.left) * scaleX,
-    y: (event.clientY - rect.top) * scaleY,
-  };
-}
-
-function emitParticles() {
-  const angle = Math.atan2(ballSpeedY, ballSpeedX) + Math.PI / 2; // Ensure particles move upward
-  const xOffset = ballRadius * Math.cos(angle);
-  const yOffset = ballRadius * Math.sin(angle);
-  const x = ballX - xOffset;
-  const y = ballY - yOffset;
-  for (let i = 0; i < 5; i++) { // Decrease the number of particles
-    particles.push(new Particle(x, y, angle + Math.random() * 0.3 - 0.15, xOffset, yOffset)); // Narrower angle range
   }
 }
 
@@ -266,12 +262,9 @@ function playerAI() {
   const minY = Math.max(predictedBallY - 20, 0);
   const maxY = Math.min(predictedBallY + 20, canvas.height - paddleHeight);
 
-  // Introduce randomness to AI movement
-  const randomFactor = 0.45; // Adjust this value (0 to 1) to control the AI's accuracy
-
-  if (playerCenter < minY && Math.random() < randomFactor) {
+  if (playerCenter < minY && Math.random() < randomFactorPlayer) {
     playerY += 3;
-  } else if (playerCenter > maxY && Math.random() < randomFactor) {
+  } else if (playerCenter > maxY && Math.random() < randomFactorPlayer) {
     playerY -= 3;
   }
 
@@ -280,6 +273,45 @@ function playerAI() {
     playerY = 0;
   } else if (playerY + paddleHeight > canvas.height) {
     playerY = canvas.height - paddleHeight;
+  }
+}
+
+canvas.addEventListener("mousemove", (event) => {
+
+  if (gameMode === "ai") return;
+
+  const mousePos = getMousePos(canvas, event);
+  const zoomLevel = parseFloat(document.body.style.zoom) / 100 || 1;
+  const rect = canvas.getBoundingClientRect();
+  const scaleY = canvas.height / rect.height;
+  
+  playerY = (mousePos.y * scaleY) / zoomLevel - paddleHeight / 2;
+
+  // Keep the player paddle within the playfield
+  if (playerY < 0) {
+    playerY = 0;
+  } else if (playerY + paddleHeight > canvas.height) {
+    playerY = canvas.height - paddleHeight;
+  }
+});
+
+  
+function getMousePos(canvas, evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top,
+  };
+}
+
+function emitParticles() {
+  const angle = Math.atan2(ballSpeedY, ballSpeedX) + Math.PI / 2; // Ensure particles move upward
+  const xOffset = ballRadius * Math.cos(angle);
+  const yOffset = ballRadius * Math.sin(angle);
+  const x = ballX - xOffset;
+  const y = ballY - yOffset;
+  for (let i = 0; i < 5; i++) { // Decrease the number of particles
+    particles.push(new Particle(x, y, angle + Math.random() * 0.3 - 0.15, xOffset, yOffset)); // Narrower angle range
   }
 }
 
