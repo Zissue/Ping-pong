@@ -1,42 +1,18 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+import { ScoreAnimation } from './Classes/scoreAnimation.js';
+import { Particle } from './Classes/particle.js';
+
 let particles = [];
 
-class Particle {
-  constructor(x, y, angle) {
-    this.x = x;
-    this.y = y;
-    this.angle = angle;
-    this.speed = 1 * Math.random() + 0.5; // Randomize speed between 0.5 and 1.5
-    this.life = 0.15;
-    this.size = Math.random() * 2 + 1; // Randomize size between 1 and 3
-  }
-
-  update() {
-    this.x += this.speed * Math.cos(this.angle) * -1;
-    this.y += this.speed * Math.sin(this.angle);
-    this.life -= 0.01;
-  }
-
-  draw(ctx) {
-    const opacity = Math.min(1, this.life * 6);
-    const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-    gradient.addColorStop(0, `rgba(255, 255, 0, ${opacity})`); // Yellow
-    gradient.addColorStop(0.4, `rgba(255, 128, 0, ${opacity})`); // Orange
-    gradient.addColorStop(1, `rgba(255, 0, 0, 0)`); // Red, but transparent
-
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, true);
-    ctx.fill();
-  }
-}
+let scoreAnimations = [];
 
 let animationFrames = 0;
 let playerPaddleColor = "#fff";
 let computerPaddleColor = "#fff";
 let colorChangeFrames = 0;
+let isPaused = false;
 
 const paddleWidth = 10;
 const paddleHeight = 75;
@@ -67,6 +43,16 @@ function drawCircle(x, y, radius, color) {
   ctx.fill();
 }
 
+function isCollidingWithPaddle(ballX, ballY, paddleX, paddleY, paddleWidth, paddleHeight) {
+  return (
+    ballX >= paddleX &&
+    ballX <= paddleX + paddleWidth &&
+    ballY + ballRadius >= paddleY &&
+    ballY - ballRadius <= paddleY + paddleHeight
+  );
+}
+
+
 function moveBall() {
   ballX += ballSpeedX;
   ballY += ballSpeedY;
@@ -75,31 +61,28 @@ function moveBall() {
     ballSpeedY = -ballSpeedY;
   }
 
+  if (isCollidingWithPaddle(ballX, ballY, 0, computerY, paddleWidth, paddleHeight)) {
+    ballSpeedX = -ballSpeedX;
+    const relativeIntersectY = (computerY + (paddleHeight / 2)) - ballY;
+    const normalizedRelativeIntersectionY = relativeIntersectY / (paddleHeight / 2);
+    const bounceAngle = normalizedRelativeIntersectionY * maxBounceAngle;
+    ballSpeedY = -Math.sin(bounceAngle) * maxSpeed;
+  } else if (isCollidingWithPaddle(ballX, ballY, canvas.width - paddleWidth, playerY, paddleWidth, paddleHeight)) {
+    ballSpeedX = -ballSpeedX;
+    const relativeIntersectY = (playerY + (paddleHeight / 2)) - ballY;
+    const normalizedRelativeIntersectionY = relativeIntersectY / (paddleHeight / 2);
+    const bounceAngle = normalizedRelativeIntersectionY * maxBounceAngle;
+    ballSpeedY = -Math.sin(bounceAngle) * maxSpeed;
+  }
+
   if (ballX < 0) {
-    if (ballY > computerY && ballY < computerY + paddleHeight) {
-      ballSpeedX = -ballSpeedX;
-      const relativeIntersectY = (computerY + (paddleHeight / 2)) - ballY;
-      const normalizedRelativeIntersectionY = relativeIntersectY / (paddleHeight / 2);
-      const bounceAngle = normalizedRelativeIntersectionY * maxBounceAngle;
-      ballSpeedY = -Math.sin(bounceAngle) * maxSpeed;
-    } else {
-      resetBall();
-    }
+    resetBall();
   }
 
   if (ballX > canvas.width) {
-    if (ballY > playerY && ballY < playerY + paddleHeight) {
-      ballSpeedX = -ballSpeedX;
-      const relativeIntersectY = (playerY + (paddleHeight / 2)) - ballY;
-      const normalizedRelativeIntersectionY = relativeIntersectY / (paddleHeight / 2);
-      const bounceAngle = normalizedRelativeIntersectionY * maxBounceAngle;
-      ballSpeedY = -Math.sin(bounceAngle) * maxSpeed;
-    } else {
-      resetBall();
-    }
+    resetBall();
   }
 }
-
 
 
 function resetBall() {
@@ -121,6 +104,59 @@ function resetBall() {
   // Set animationFrames and colorChangeFrames
   animationFrames = 60;
   colorChangeFrames = 120;
+
+  // Pause the game for 0.5 seconds and then continue
+  isPaused = true;
+  setTimeout(() => {
+    isPaused = false;
+    ballX = canvas.width / 2;
+    ballY = canvas.height / 2;
+    ballSpeedX = -ballSpeedX;
+    ballSpeedY = 0;
+  }, 800);
+
+  // Show +1 animation
+  showScoreAnimation();
+
+  // Add a ScoreAnimation instance
+  if (ballX > canvas.width) {
+    scoreAnimations.push(new ScoreAnimation(canvas.width - paddleWidth - 50, playerY));
+  } else {
+    scoreAnimations.push(new ScoreAnimation(paddleWidth + 10, computerY));
+  }
+}
+
+function pauseGame(duration, callback) {
+  clearInterval(gameInterval);
+  setTimeout(() => {
+    gameInterval = setInterval(gameLoop, 1000 / 60); // 60 FPS
+    if (typeof callback === "function") {
+      callback();
+    }
+  }, duration);
+}
+
+function showScoreAnimation() {
+  const scoreAnimation = document.createElement("div");
+  scoreAnimation.innerHTML = "+1";
+  scoreAnimation.style.position = "absolute";
+  scoreAnimation.style.top = "0";
+  scoreAnimation.style.left = "50%";
+  scoreAnimation.style.transform = "translateX(-50%)";
+  scoreAnimation.style.fontSize = "2rem";
+  scoreAnimation.style.fontWeight = "bold";
+  scoreAnimation.style.opacity = "1";
+  scoreAnimation.style.transition = "top 0.5s ease-out, opacity 0.5s ease-out";
+  document.body.appendChild(scoreAnimation);
+
+  // Animate and remove the element after 0.5 seconds
+  setTimeout(() => {
+    scoreAnimation.style.top = "-40px";
+    scoreAnimation.style.opacity = "0";
+    setTimeout(() => {
+      document.body.removeChild(scoreAnimation);
+    }, 500);
+  }, 0);
 }
 
 function handlePaddleColorChange() {
@@ -151,9 +187,12 @@ function computerAI() {
   const minY = Math.max(predictedBallY - 20, 0);
   const maxY = Math.min(predictedBallY + 20, canvas.height - paddleHeight);
 
-  if (computerCenter < minY) {
+  // Introduce randomness to AI movement
+  const randomFactor = 0.3; // Adjust this value (0 to 1) to control the AI's accuracy
+
+  if (computerCenter < minY && Math.random() < randomFactor) {
     computerY += 3;
-  } else if (computerCenter > maxY) {
+  } else if (computerCenter > maxY && Math.random() < randomFactor) {
     computerY -= 3;
   }
 
@@ -213,23 +252,37 @@ function draw() {
 
   // Handle paddle color change
   handlePaddleColorChange();
+
+  // Draw ScoreAnimations
+  scoreAnimations.forEach((animation) => {
+    animation.update();
+    animation.draw(ctx);
+  });
+
+  // Remove finished ScoreAnimations
+  scoreAnimations = scoreAnimations.filter((animation) => animation.opacity > 0);
 }
 
 function emitParticles() {
   const angle = Math.atan2(ballSpeedY, ballSpeedX) + Math.PI / 2; // Ensure particles move upward
-  const x = ballX - ballRadius * Math.cos(angle);
-  const y = ballY - ballRadius * Math.sin(angle);
+  const xOffset = ballRadius * Math.cos(angle);
+  const yOffset = ballRadius * Math.sin(angle);
+  const x = ballX - xOffset;
+  const y = ballY - yOffset;
   for (let i = 0; i < 5; i++) { // Decrease the number of particles
-    particles.push(new Particle(x, y, angle + Math.random() * 0.3 - 0.15)); // Narrower angle range
+    particles.push(new Particle(x, y, angle + Math.random() * 0.3 - 0.15, xOffset, yOffset)); // Narrower angle range
   }
 }
 
 
+
 function gameLoop() {
-  moveBall();
-  computerAI();
-  emitParticles();
-  draw();
+  if (!isPaused) {
+    moveBall();
+    computerAI();
+    emitParticles();
+    draw();
+  }
 
   requestAnimationFrame(gameLoop);
 }
