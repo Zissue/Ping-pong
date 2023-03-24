@@ -8,9 +8,9 @@ class Particle {
     this.x = x;
     this.y = y;
     this.angle = angle;
-    this.speed = 5;
+    this.speed = 5 * Math.random() + 2; // Randomize speed between 2 and 7
     this.life = 0.3;
-    this.size = 8;
+    this.size = Math.random() * 5 + 3; // Randomize size between 3 and 8
   }
 
   update() {
@@ -21,7 +21,12 @@ class Particle {
 
   draw(ctx) {
     const opacity = Math.min(1, this.life * 3);
-    ctx.fillStyle = `rgba(255, 128, 0, ${opacity})`;
+    const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+    gradient.addColorStop(0, `rgba(255, 255, 0, ${opacity})`); // Yellow
+    gradient.addColorStop(0.5, `rgba(255, 128, 0, ${opacity})`); // Orange
+    gradient.addColorStop(1, `rgba(255, 0, 0, ${opacity})`); // Red
+
+    ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, true);
     ctx.fill();
@@ -214,10 +219,11 @@ function emitParticles() {
   const angle = Math.atan2(ballSpeedY, ballSpeedX);
   const x = ballX - ballRadius * Math.cos(angle);
   const y = ballY - ballRadius * Math.sin(angle);
-  for (let i = 0; i < 5; i++) {
-    particles.push(new Particle(x, y, angle + Math.random() * 0.4 - 0.2));
+  for (let i = 0; i < 10; i++) { // Increase the number of particles to 10
+    particles.push(new Particle(x, y, angle + Math.random() * 0.8 - 0.4)); // Wider angle range
   }
 }
+
 
 function gameLoop() {
   moveBall();
