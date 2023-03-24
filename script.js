@@ -9,7 +9,7 @@ let playerY = (canvas.height - paddleHeight) / 2;
 let computerY = (canvas.height - paddleHeight) / 2;
 let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
-let ballSpeedX = 5;
+let ballSpeedX = 1;
 let ballSpeedY = 0;
 
 function drawRect(x, y, width, height, color) {
