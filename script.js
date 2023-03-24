@@ -211,9 +211,6 @@ function draw() {
 }
 
 function emitParticles() {
-  if (ballSpeedX > 0) {
-    return;
-  }
   const angle = Math.atan2(ballSpeedY, ballSpeedX);
   const x = ballX - ballRadius * Math.cos(angle);
   const y = ballY - ballRadius * Math.sin(angle);
