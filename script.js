@@ -17,6 +17,7 @@ let ballY = canvas.height / 2;
 let ballSpeedX = 3;
 let ballSpeedY = -10;
 const maxSpeed = 6;
+const maxBounceAngle = 5 * Math.PI / 12; // 75 degrees in radians
 
 let playerScore = 0;
 let computerScore = 0;
@@ -35,7 +36,6 @@ function drawCircle(x, y, radius, color) {
 }
 
 function moveBall() {
-
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
@@ -46,7 +46,10 @@ function moveBall() {
   if (ballX < 0) {
     if (ballY > computerY && ballY < computerY + paddleHeight) {
       ballSpeedX = -ballSpeedX;
-      ballSpeedY += (ballY - (computerY + paddleHeight / 2)) * 0.3;
+      const relativeIntersectY = (computerY + (paddleHeight / 2)) - ballY;
+      const normalizedRelativeIntersectionY = relativeIntersectY / (paddleHeight / 2);
+      const bounceAngle = normalizedRelativeIntersectionY * maxBounceAngle;
+      ballSpeedY = -Math.sin(bounceAngle) * maxSpeed;
     } else {
       resetBall();
     }
@@ -55,18 +58,16 @@ function moveBall() {
   if (ballX > canvas.width) {
     if (ballY > playerY && ballY < playerY + paddleHeight) {
       ballSpeedX = -ballSpeedX;
-      ballSpeedY += (ballY - (playerY + paddleHeight / 2)) * 0.3;
+      const relativeIntersectY = (playerY + (paddleHeight / 2)) - ballY;
+      const normalizedRelativeIntersectionY = relativeIntersectY / (paddleHeight / 2);
+      const bounceAngle = normalizedRelativeIntersectionY * maxBounceAngle;
+      ballSpeedY = -Math.sin(bounceAngle) * maxSpeed;
     } else {
       resetBall();
     }
   }
-
-  const speedMagnitude = Math.sqrt(ballSpeedX * ballSpeedX + ballSpeedY * ballSpeedY);
-  if (speedMagnitude > maxSpeed) {
-    ballSpeedX = (ballSpeedX / speedMagnitude) * maxSpeed;
-    ballSpeedY = (ballSpeedY / speedMagnitude) * maxSpeed;
-  }
 }
+
 
 
 function resetBall() {
