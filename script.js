@@ -9,7 +9,7 @@ let playerY = (canvas.height - paddleHeight) / 2;
 let computerY = (canvas.height - paddleHeight) / 2;
 let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
-let ballSpeedX = 2;
+let ballSpeedX = 3;
 let ballSpeedY = -10;
 const maxSpeed = 10;
 
@@ -72,7 +72,7 @@ function resetBall() {
     playerScore++;
   }
   
-  scoreboard.textContent = `Player: ${playerScore} | Computer: ${computerScore}`;
+  scoreboard.textContent = `Computer: ${computerScore} | Player: ${playerScore}`;
   
   ballX = canvas.width / 2;
   ballY = canvas.height / 2;
