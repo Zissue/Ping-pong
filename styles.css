@@ -1,0 +1,23 @@
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #202020;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: #fff;
+}
+
+h1 {
+  margin-bottom: 1rem;
+}
+
+#scoreboard {
+  margin-bottom: 1rem;
+}
+
+canvas {
+  border: 1px solid #fff;
+}
