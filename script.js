@@ -229,7 +229,7 @@ function gameLoop() {
 }
 
 async function getLastCommitDate() {
-  const token = process.env.GITHUB_TOKEN;
+  const token = process.env.READ_COMMIT_TOKEN;
   const response = await fetch("https://api.github.com/repos/zissue/zissue.github.io/commits?per_page=1", {
     headers: {
       Authorization: `token ${token}`,
