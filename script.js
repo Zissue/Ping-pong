@@ -25,7 +25,7 @@ function drawCircle(x, y, radius, color) {
 }
 
 function moveBall() {
-  const maxSpeed = 10;
+  const maxSpeed = 5;
 
   ballX += ballSpeedX;
   ballY += ballSpeedY;
