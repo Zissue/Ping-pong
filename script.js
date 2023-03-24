@@ -209,11 +209,9 @@ function draw() {
 }
 
 function emitParticles() {
-  const particleCount = Math.abs(ballSpeedX) + Math.abs(ballSpeedY);
-
-  for (let i = 0; i < particleCount; i++) {
-    const particle = new Particle(ballX, ballY, Math.random() * Math.PI * 2);
-    particles.push(particle);
+  const angle = Math.atan2(ballSpeedY, ballSpeedX);
+  for (let i = 0; i < 5; i++) {
+    particles.push(new Particle(ballX, ballY, angle + Math.random() * 0.4 - 0.2));
   }
 }
 
