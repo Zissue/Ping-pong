@@ -123,7 +123,15 @@ function computerAI() {
   } else if (computerCenter > maxY) {
     computerY -= 3;
   }
+
+  // Keep the computer paddle within the playfield
+  if (computerY < 0) {
+    computerY = 0;
+  } else if (computerY + paddleHeight > canvas.height) {
+    computerY = canvas.height - paddleHeight;
+  }
 }
+
 
 
 canvas.addEventListener("mousemove", (event) => {
