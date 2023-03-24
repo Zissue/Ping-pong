@@ -228,5 +228,24 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
+async function getLastCommitDate() {
+  const token = process.env.GITHUB_TOKEN;
+  const response = await fetch("https://api.github.com/repos/zissue/zissue.github.io/commits?per_page=1", {
+    headers: {
+      Authorization: `token ${token}`,
+    },
+  });
+  const data = await response.json();
+  return data[0].commit.author.date;
+}
+
+async function updateLastUpdated() {
+  const lastCommitDate = await getLastCommitDate();
+  const lastUpdatedElement = document.getElementById("last-updated");
+  lastUpdatedElement.textContent = `Last updated: ${lastCommitDate}`;
+}
+
+updateLastUpdated();
+
 // Start the game loop
 gameLoop();
