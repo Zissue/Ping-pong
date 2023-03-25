@@ -29,15 +29,20 @@ function togglePauseResume() {
   isPaused = !isPaused;
 }
 
-
 import { ScoreAnimation } from './Classes/scoreAnimation.js';
 import { Particle } from './Classes/particle.js';
 
 let insaneImage = new Image();
-insaneImage.src = "img/PagBounce.gif";
+insaneImage.src = "media/img/PagBounce.gif";
 
 let soBadImage = new Image();
-soBadImage.src = "img/OMEGALUL.png";
+soBadImage.src = "media/img/OMEGALUL.png";
+
+const sound1 = new Audio("media/sound/h1.wav");
+const sound2 = new Audio("media/sound/h2.wav");
+
+const pass = new Audio("media/sound/pass.ogg");
+const fail = new Audio("media/sound/fail.mp3");
 
 let messageDuration = 1; // Change this value to control message duration
 let showMessage = false;
@@ -108,12 +113,26 @@ function moveBall() {
     const normalizedRelativeIntersectionY = relativeIntersectY / (paddleHeight / 2);
     const bounceAngle = normalizedRelativeIntersectionY * maxBounceAngle;
     ballSpeedY = -Math.sin(bounceAngle) * maxSpeed;
+
+    // Increase the ball speed after hitting the paddle
+    ballSpeedX *= 1.05;
+    ballSpeedY *= 1.05;
+
+    // Play sound2 when the ball hits the left paddle
+    sound2.play();
   } else if (isCollidingWithPaddle(ballX, ballY, canvas.width - paddleWidth, playerY, paddleWidth, paddleHeight)) {
     ballSpeedX = -ballSpeedX;
     const relativeIntersectY = (playerY + (paddleHeight / 2)) - ballY;
     const normalizedRelativeIntersectionY = relativeIntersectY / (paddleHeight / 2);
     const bounceAngle = normalizedRelativeIntersectionY * maxBounceAngle;
     ballSpeedY = -Math.sin(bounceAngle) * maxSpeed;
+
+    // Increase the ball speed after hitting the paddle
+    ballSpeedX *= 1.05;
+    ballSpeedY *= 1.05;
+
+    // Play sound1 when the ball hits the right paddle
+    sound1.play();
   }
 
   if (ballX < 0) {
@@ -132,11 +151,13 @@ function resetBall() {
     playerPaddleColor = "#f00";
     showMessage = true;
     lastScorer = "computer";
+    fail.play();
   } else {
     playerScore++;
     computerPaddleColor = "#f00";
     showMessage = true;
     lastScorer = "player";
+    pass.play();
   }
 
   scoreboard.textContent = `Computer: ${computerScore} | Player: ${playerScore}`;
@@ -156,7 +177,7 @@ function resetBall() {
     isPaused = false;
     ballX = canvas.width / 2;
     ballY = canvas.height / 2;
-    ballSpeedX = -ballSpeedX;
+    ballSpeedX = 3;
     ballSpeedY = 0;
   }, 800);
 
@@ -225,8 +246,8 @@ function animateScore() {
 }
 
 
-const randomFactorPlayer = 0.99; // Adjust this value (0 to 1) to control the player AI's accuracy
-const randomFactorAI = 0.6; // Adjust this value (0 to 1) to control the AI's accuracy
+const randomFactorPlayer = 0.7; // Adjust this value (0 to 1) to control the player AI's accuracy
+const randomFactorAI = 0.7; // Adjust this value (0 to 1) to control the AI's accuracy
 
 function computerAI() {
   const computerCenter = computerY + paddleHeight / 2;
