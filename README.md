@@ -5,3 +5,4 @@ The game has two game modes:
   - AI vs Player
   - AI vs AI
   
+Play it [HERE](https://ping-pong-2zj.pages.dev/)
