@@ -29,6 +29,9 @@ function togglePauseResume() {
   isPaused = !isPaused;
 }
 
+let randomFactorPlayer = 0.99; // Adjust this value (0 to 1) to control the player AI's accuracy
+let randomFactorAI = 0.99; // Adjust this value (0 to 1) to control the AI's accuracy
+
 import { ScoreAnimation } from './Classes/scoreAnimation.js';
 import { Particle } from './Classes/particle.js';
 
@@ -222,7 +225,7 @@ function showScoreAnimation() {
     scoreAnimation.style.opacity = "0";
     setTimeout(() => {
       document.body.removeChild(scoreAnimation);
-    }, 500);
+    }, 1000);
   }, 0);
 }
 
@@ -244,10 +247,6 @@ function animateScore() {
     scoreboard.style.transform = 'scale(1)';
   }
 }
-
-
-const randomFactorPlayer = 0.7; // Adjust this value (0 to 1) to control the player AI's accuracy
-const randomFactorAI = 0.7; // Adjust this value (0 to 1) to control the AI's accuracy
 
 function computerAI() {
   const computerCenter = computerY + paddleHeight / 2;
@@ -422,6 +421,11 @@ function gameLoop() {
     // Update the game loop to handle the new game mode
     if (gameMode === "ai") {
       playerAI();
+      randomFactorPlayer = 0.99;
+      randomFactorAI = 0.99;
+    }
+    else {
+      randomFactorAI = 0.3;
     }
 
     updateScore();
